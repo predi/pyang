@@ -523,18 +523,15 @@ class SidFile:
                 return False
         return True
 
-    # Groups of keywords with same handling in some method below, named after a representative
-    leaf_keywords = ('leaf', 'leaf-list', 'anyxml', 'anydata')
-    container_keywords = ('container', 'list')
-    choice_keywords = ('choice', 'case')
-    inrpc_keywords = ('input', 'output')
-    grouping_keywords = ('grouping', 'choice', 'case')
-    module_keywords = ('module', 'container', 'list', 'notification', 'rpc', 'action')
+    # Keywords that represent schema node items
+    schema_node_keywords = ('action', 'container', 'leaf', 'leaf-list', 'list', 'choice', 'case', 'rpc', 'input',
+                            'output',  'notification', 'anydata', 'anyxml', ('ietf-restconf', 'yang-data'),
+                            ('ietf-yang-structure-ext', 'structure'))
 
     @staticmethod
-    def has_yang_data_extension(statement):
+    def is_augment_structure_extension(statement):
         try:
-            return statement.i_extension.arg == 'yang-data'
+            return statement.keyword == ('ietf-yang-structure-ext', 'augment-structure')
         except AttributeError:
             return False
 
@@ -556,96 +553,61 @@ class SidFile:
         for feature in module.i_features:
             self.merge_item('feature', feature)
 
-        for statement in module.i_children:
-            if statement.keyword in self.leaf_keywords:
-                self.merge_item('data', self.get_path(statement))
-
-            elif statement.keyword in self.container_keywords:
-                self.merge_item('data', self.get_path(statement))
-                self.collect_inner_data_nodes(statement.i_children)
-
-            elif statement.keyword in self.choice_keywords:
-                self.collect_inner_data_nodes(statement.i_children)
-
-            elif statement.keyword == 'rpc':
-                self.merge_item('data', "/%s:%s" % (self.module_name, statement.arg))
-                for substmt in statement.i_children:
-                    if substmt.keyword in self.inrpc_keywords:
-                        self.collect_inner_data_nodes(substmt.i_children)
-
-            elif statement.keyword == 'notification':
-                self.merge_item('data', "/%s:%s" % (self.module_name, statement.arg))
-                self.collect_inner_data_nodes(statement.i_children)
+        self.iterate_schema_nodes(module, module, '')
 
         for identity in module.i_identities:
             self.merge_item('identity', identity)
 
         for substmt in module.substmts:
-            if substmt.keyword == 'augment':
-                self.collect_in_substmts(substmt.substmts)
-            elif self.has_yang_data_extension(substmt):
-                self.collect_in_substmts(substmt.substmts)
+            if (substmt.keyword == 'augment' or self.is_augment_structure_extension(substmt))\
+                    and hasattr(substmt, 'i_target_node'):
+                self.iterate_schema_nodes(substmt.i_target_node, module, self.get_path_to_root(substmt.i_target_node))
 
-    def collect_inner_data_nodes(self, statements, prefix=""):
-        for statement in statements:
-            if statement.keyword in self.leaf_keywords:
-                self.merge_item('data', self.get_path(statement, prefix))
+    def iterate_schema_nodes(self, parent, module, path):
+        if not hasattr(parent, 'i_children'):
+            return
+        schema_nodes = parent.i_children
+        if schema_nodes is None:
+            return
+        for schema_node in schema_nodes:
+            if schema_node.i_module is not None and self.is_from_same_namespace(schema_node, module) \
+                    and schema_node.keyword in self.schema_node_keywords:
+                new_path = self.add_to_path(schema_node, parent, path)
+                self.merge_item('data', new_path)
+                self.iterate_schema_nodes(schema_node, module, new_path)
 
-            elif statement.keyword in self.container_keywords:
-                self.merge_item('data', self.get_path(statement, prefix))
-                self.collect_inner_data_nodes(statement.i_children, prefix)
+    def is_from_same_namespace(self, schema_node, module):
+        if schema_node.i_module.keyword == 'submodule':
+            return schema_node.i_module.i_ctx.get_module(schema_node.i_module.i_including_modulename) == module
+        else:
+            return schema_node.i_module == module
 
-            elif statement.keyword == 'action':
-                self.merge_item('data', self.get_path(statement, prefix))
-                for substmt in statement.i_children:
-                    if substmt.keyword in self.inrpc_keywords:
-                        self.collect_inner_data_nodes(substmt.i_children, prefix)
-
-            elif statement.keyword == 'notification':
-                self.merge_item('data', self.get_path(statement, prefix))
-                self.collect_inner_data_nodes(statement.i_children, prefix)
-
-            elif statement.keyword in self.choice_keywords:
-                self.collect_inner_data_nodes(statement.i_children, prefix)
-
-    def collect_in_substmts(self, substmts):
-        for statement in substmts:
-            if statement.keyword in self.leaf_keywords:
-                self.merge_item('data', self.get_path(statement))
-
-            elif statement.keyword in self.container_keywords:
-                self.merge_item('data', self.get_path(statement))
-                self.collect_in_substmts(statement.substmts)
-
-            elif statement.keyword in self.choice_keywords:
-                self.collect_in_substmts(statement.substmts)
-
-            elif statement.keyword == 'uses':
-                prefix = self.get_path(statement.parent)
-                self.collect_inner_data_nodes(statement.i_grouping.i_children, prefix)
-
-    def get_path(self, statement, prefix=""):
-        path = ""
-
-        while statement.i_module is not None:
-            if (statement.keyword not in self.grouping_keywords
-                    and not self.has_yang_data_extension(statement)):
-                # Locate the data node parent
-                parent = statement.parent
-                while parent.i_module is not None:
-                    if parent.keyword in self.module_keywords:
-                        break
-                    parent = parent.parent
-
-                if (prefix != "" or
-                    (parent.i_module is not None and parent.i_module == statement.i_module)):
-                    path = "/" + statement.arg + path
-                else:
-                    path = "/" + statement.i_module.arg + ":" + statement.arg + path
-
-            statement = statement.parent
+    def add_to_path(self, schema_node, parent, prefix=""):
+        if prefix == "" or schema_node.i_module != parent.i_module:
+            path = "/" + schema_node.i_module.arg + ":" + schema_node.arg
+        else:
+            path = "/" + schema_node.arg
 
         return prefix + path
+
+    def get_path_to_root(self, schema_node):
+        path_components = []
+
+        while schema_node is not None:
+            path_components.append(schema_node)
+            schema_node = schema_node.parent
+
+        path = ''
+        size = len(path_components)
+        for i in reversed(range(size)):
+            node = path_components[i]
+            if i == size - 1:
+                pass  # module/submodule
+            else:
+                parent = path_components[i + 1]
+                path = self.add_to_path(node, parent, path)
+
+        return path
 
     def merge_item(self, namespace, identifier):
         for item in self.content['items']:
