@@ -541,8 +541,9 @@ class SidFile:
         return True
 
     # Keywords that represent schema node items
-    schema_node_keywords = ('action', 'container', 'leaf', 'leaf-list', 'list', 'choice', 'case', 'rpc', 'input',
-                            'output',  'notification', 'anydata', 'anyxml', ('ietf-restconf', 'yang-data'),
+    schema_node_keywords = ('action', 'container', 'leaf', 'leaf-list', 'list', 'choice', 'case',
+                            'rpc', 'input', 'output',  'notification', 'anydata', 'anyxml',
+                            ('ietf-restconf', 'yang-data'),
                             ('ietf-yang-structure-ext', 'structure'))
 
     @staticmethod
@@ -578,7 +579,8 @@ class SidFile:
         for substmt in module.substmts:
             if (substmt.keyword == 'augment' or self.is_augment_structure_extension(substmt))\
                     and hasattr(substmt, 'i_target_node'):
-                self.iterate_schema_nodes(substmt.i_target_node, module, self.get_path_to_root(substmt.i_target_node))
+                self.iterate_schema_nodes(
+                    substmt.i_target_node, module, self.get_path_to_root(substmt.i_target_node))
 
     def iterate_schema_nodes(self, parent, module, path):
         if not hasattr(parent, 'i_children'):
@@ -587,7 +589,8 @@ class SidFile:
         if schema_nodes is None:
             return
         for schema_node in schema_nodes:
-            if schema_node.i_module is not None and self.is_from_same_namespace(schema_node, module) \
+            if schema_node.i_module is not None \
+                    and self.is_from_same_namespace(schema_node, module) \
                     and schema_node.keyword in self.schema_node_keywords:
                 new_path = self.add_to_path(schema_node, parent, path)
                 self.merge_item('data', new_path)
@@ -595,9 +598,9 @@ class SidFile:
 
     def is_from_same_namespace(self, schema_node, module):
         if schema_node.i_module.keyword == 'submodule':
-            return schema_node.i_module.i_ctx.get_module(schema_node.i_module.i_including_modulename) == module
-        else:
-            return schema_node.i_module == module
+            return schema_node.i_module.i_ctx.get_module(
+                schema_node.i_module.i_including_modulename) == module
+        return schema_node.i_module == module
 
     def add_to_path(self, schema_node, parent, prefix=""):
         if prefix == "" or schema_node.i_module != parent.i_module:
