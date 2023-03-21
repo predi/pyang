@@ -1,8 +1,8 @@
 {
   "assignment-ranges": [
     {
-      "entry-point": 20000,
-      "size": 25
+      "entry-point": "20000",
+      "size": "25"
     }
   ],
   "module-name": "toaster",
@@ -11,112 +11,112 @@
     {
       "namespace": "module",
       "identifier": "toaster",
-      "sid": 20000
+      "sid": "20000"
     },
     {
       "namespace": "identity",
       "identifier": "frozen-bagel",
-      "sid": 20001
+      "sid": "20001"
     },
     {
       "namespace": "identity",
       "identifier": "frozen-waffle",
-      "sid": 20002
+      "sid": "20002"
     },
     {
       "namespace": "identity",
       "identifier": "hash-brown",
-      "sid": 20003
+      "sid": "20003"
     },
     {
       "namespace": "identity",
       "identifier": "toast-type",
-      "sid": 20004
+      "sid": "20004"
     },
     {
       "namespace": "identity",
       "identifier": "wheat-bread",
-      "sid": 20005
+      "sid": "20005"
     },
     {
       "namespace": "identity",
       "identifier": "white-bread",
-      "sid": 20006
+      "sid": "20006"
     },
     {
       "namespace": "identity",
       "identifier": "wonder-bread",
-      "sid": 20007
+      "sid": "20007"
     },
     {
       "namespace": "data",
       "identifier": "/toaster:cancel-toast",
-      "sid": 20008
+      "sid": "20008"
     },
     {
       "namespace": "data",
       "identifier": "/toaster:cancel-toast/input",
-      "sid": 20009
+      "sid": "20009"
     },
     {
       "namespace": "data",
       "identifier": "/toaster:cancel-toast/output",
-      "sid": 20010
+      "sid": "20010"
     },
     {
       "namespace": "data",
       "identifier": "/toaster:make-toast",
-      "sid": 20011
+      "sid": "20011"
     },
     {
       "namespace": "data",
       "identifier": "/toaster:make-toast/input",
-      "sid": 20012
+      "sid": "20012"
     },
     {
       "namespace": "data",
       "identifier": "/toaster:make-toast/input/toasterDoneness",
-      "sid": 20013
+      "sid": "20013"
     },
     {
       "namespace": "data",
       "identifier": "/toaster:make-toast/input/toasterToastType",
-      "sid": 20014
+      "sid": "20014"
     },
     {
       "namespace": "data",
       "identifier": "/toaster:make-toast/output",
-      "sid": 20015
+      "sid": "20015"
     },
     {
       "namespace": "data",
       "identifier": "/toaster:toastDone",
-      "sid": 20016
+      "sid": "20016"
     },
     {
       "namespace": "data",
       "identifier": "/toaster:toastDone/toastStatus",
-      "sid": 20017
+      "sid": "20017"
     },
     {
       "namespace": "data",
       "identifier": "/toaster:toaster",
-      "sid": 20018
+      "sid": "20018"
     },
     {
       "namespace": "data",
       "identifier": "/toaster:toaster/toasterManufacturer",
-      "sid": 20019
+      "sid": "20019"
     },
     {
       "namespace": "data",
       "identifier": "/toaster:toaster/toasterModelNumber",
-      "sid": 20020
+      "sid": "20020"
     },
     {
       "namespace": "data",
       "identifier": "/toaster:toaster/toasterStatus",
-      "sid": 20021
+      "sid": "20021"
     }
   ]
 }

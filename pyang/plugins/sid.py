@@ -14,11 +14,16 @@ import os
 import errno
 import json
 from json import JSONDecodeError
-
+import copy
 
 from pyang import plugin
 from pyang import util
 from pyang import error
+
+try:
+    string_types = basestring  # Python 2
+except NameError:
+    string_types = str  # Python 3
 
 def pyang_plugin_init():
     plugin.register_plugin(SidPlugin())
@@ -434,12 +439,20 @@ class SidFile:
             for key in arange:
                 if key == 'entry-point':
                     entry_point_absent = False
-                    if not isinstance(arange[key], util.int_types):
+                    if not isinstance(arange[key], string_types):  # YANG uint64 value
+                        raise SidFileError("invalid 'entry-point' value '%s'." % arange[key])
+                    try:
+                        arange[key] = int(arange[key])  # integers internally
+                    except ValueError:
                         raise SidFileError("invalid 'entry-point' value '%s'." % arange[key])
 
                 elif key == 'size':
                     size_absent = False
-                    if not isinstance(arange[key], util.int_types):
+                    if not isinstance(arange[key], string_types):  # YANG uint64 value
+                        raise SidFileError("invalid 'size' value '%s'." % arange[key])
+                    try:
+                        arange[key] = int(arange[key])  # integers internally
+                    except ValueError:
                         raise SidFileError("invalid 'size' value '%s'." % arange[key])
 
                 else:
@@ -472,7 +485,11 @@ class SidFile:
 
                 elif key == 'sid':
                     sid_absent = False
-                    if not isinstance(item[key], util.int_types):
+                    if not isinstance(item[key], string_types):  # YANG uint64 value
+                        raise SidFileError("invalid 'sid' value '%s'." % item[key])
+                    try:
+                        item[key] = int(item[key])  # integers internally
+                    except ValueError:
                         raise SidFileError("invalid 'sid' value '%s'." % item[key])
 
                 else:
@@ -723,7 +740,32 @@ class SidFile:
             os.remove(self.output_file_name)
 
         with open(self.output_file_name, 'w') as outfile:
-            json.dump(self.content, outfile, indent=2)
+            json.dump(self.stringify_yang_uint64_values(), outfile, indent=2)
+
+    ########################################################
+    def stringify_yang_uint64_values(self):
+        # leaves self.content intact, since it is needed later
+        stringified = copy.deepcopy(self.content)
+        return self.convert_yang_uin64_values(stringified)
+
+    ########################################################
+    @staticmethod
+    def convert_yang_uin64_values(mapping):
+        if isinstance(mapping['assignment-ranges'], list):
+            for assignment_range in mapping['assignment-ranges']:
+                entry_point = assignment_range['entry-point']
+                if isinstance(entry_point, util.int_types):
+                    assignment_range['entry-point'] = str(entry_point)
+                size = assignment_range['size']
+                if isinstance(size, util.int_types):
+                    assignment_range['size'] = str(size)
+        if isinstance(mapping['assignment-ranges'], list):
+            for item in mapping['items']:
+                sid = item['sid']
+                if isinstance(sid, util.int_types):
+                    item['sid'] = str(sid)
+
+        return mapping
 
     ########################################################
     def number_of_sids_allocated(self):
@@ -770,7 +812,7 @@ class SidFile:
         print(json.dumps(info, indent=2))
 
     ########################################################
-    # Perform the conversion to the .sid file fromat introduced by [I-D.ietf-core-sid] version 3.
+    # Perform the conversion to the .sid file format introduced by [I-D.ietf-core-sid] version 3.
     # This method can be removed after the proper transition period.
 
     node_keywords = ('node', 'notification', 'rpc', 'action')
@@ -800,3 +842,8 @@ class SidFile:
             elif type_ in self.node_keywords:
                 item['namespace'] = 'data'
                 item['identifier'] = '/' + self.module_name + ':' + label[1:]
+
+        # This plug-in used to generate JSON files that did not comply with RFC 7951, Section 6.1,
+        # p2. The following method call tolerates such legacy files by converting all invalid values
+        # into expected ones.
+        self.convert_yang_uin64_values(self.content)
