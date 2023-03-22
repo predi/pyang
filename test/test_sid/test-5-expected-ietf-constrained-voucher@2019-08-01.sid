@@ -1,13 +1,27 @@
 {
-  "assignment-ranges": [
+  "module-name": "ietf-constrained-voucher",
+  "module-revision": "2019-08-01",
+  "dependency-revision": [
+    {
+      "module-name": "ietf-restconf",
+      "module-revision": "2017-01-26"
+    },
+    {
+      "module-name": "ietf-voucher",
+      "module-revision": "2018-05-09"
+    },
+    {
+      "module-name": "ietf-yang-types",
+      "module-revision": "2013-07-15"
+    }
+  ],
+  "assignment-range": [
     {
       "entry-point": "2500",
       "size": "50"
     }
   ],
-  "module-name": "ietf-constrained-voucher",
-  "module-revision": "2019-08-01",
-  "items": [
+  "item": [
     {
       "namespace": "module",
       "identifier": "ietf-constrained-voucher",

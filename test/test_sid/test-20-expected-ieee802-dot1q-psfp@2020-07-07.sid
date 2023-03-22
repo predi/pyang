@@ -1,13 +1,27 @@
 {
-  "assignment-ranges": [
+  "module-name": "ieee802-dot1q-psfp",
+  "module-revision": "2020-07-07",
+  "dependency-revision": [
+    {
+      "module-name": "ieee802-dot1q-types",
+      "module-revision": "2018-03-07"
+    },
+    {
+      "module-name": "ieee802-dot1q-bridge",
+      "module-revision": "2020-11-06"
+    },
+    {
+      "module-name": "ieee802-dot1q-stream-filters-gates",
+      "module-revision": "2020-11-06"
+    }
+  ],
+  "assignment-range": [
     {
       "entry-point": "60000",
       "size": "100"
     }
   ],
-  "module-name": "ieee802-dot1q-psfp",
-  "module-revision": "2020-07-07",
-  "items": [
+  "item": [
     {
       "namespace": "module",
       "identifier": "ieee802-dot1q-psfp",

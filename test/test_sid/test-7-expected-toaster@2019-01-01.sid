@@ -1,5 +1,7 @@
 {
-  "assignment-ranges": [
+  "module-name": "toaster",
+  "module-revision": "2019-01-01",
+  "assignment-range": [
     {
       "entry-point": "20000",
       "size": "25"
@@ -9,9 +11,7 @@
       "size": "25"
     }
   ],
-  "module-name": "toaster",
-  "module-revision": "2019-01-01",
-  "items": [
+  "item": [
     {
       "namespace": "module",
       "identifier": "toaster",
