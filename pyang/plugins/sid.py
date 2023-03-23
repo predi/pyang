@@ -443,6 +443,8 @@ class SidFile:
 
     ########################################################
     # Verify the tag and data type of each .sid file JSON object
+    status_ends = ('unpublished', 'published')
+
     def validate_key_and_value(self):
         assignment_ranges_absent = True
         module_name_absent = True
@@ -463,7 +465,17 @@ class SidFile:
                 module_revision_absent = False
 
             elif key == 'description' or key == 'ietf-sid-file:description':
-                pass
+                if not (isinstance(self.content[key], string_types)):
+                    raise SidFileError("invalid 'description' value '%s'." % self.content[key])
+
+            elif key == 'sid-file-version' or key == 'ietf-sid-file:sid-file-version':
+                if not (isinstance(self.content[key], int)):
+                    raise SidFileError("invalid 'sid-file-version' value '%s'." % self.content[key])
+
+            elif key == 'sid-file-status' or key == 'ietf-sid-file:sid-file-status':
+                if not (isinstance(self.content[key], string_types)
+                        and self.content[key].endswith(self.status_ends)):
+                    raise SidFileError("invalid 'description' value '%s'." % self.content[key])
 
             elif key == 'dependency-revision' or key == 'ietf-sid-file:dependency-revision':
                 if not isinstance(self.content[key], list):
@@ -553,13 +565,13 @@ class SidFile:
             for key in item:
                 if key == 'namespace' or key == 'ietf-sid-file:namespace':
                     namespace_absent = False
-                    if not (isinstance(item[key], str)
+                    if not (isinstance(item[key], string_types)
                             and item[key].endswith(self.namespace_ends)):
                         raise SidFileError("invalid 'namespace' value '%s'." % item[key])
 
                 elif key == 'identifier' or key == 'ietf-sid-file:identifier':
                     identifier_absent = False
-                    if not isinstance(item[key], str):
+                    if not isinstance(item[key], string_types):
                         raise SidFileError("invalid 'identifier' value '%s'." % item[key])
 
                 elif key == 'sid' or key == 'ietf-sid-file:sid':
@@ -590,12 +602,12 @@ class SidFile:
             for key in item:
                 if key == 'module-name' or key == 'ietf-sid-file:module-name':
                     module_name_absent = False
-                    if not (isinstance(item[key], str)):
+                    if not (isinstance(item[key], string_types)):
                         raise SidFileError("invalid 'module-name' value '%s'." % item[key])
 
                 elif key == 'module-revision' or key == 'ietf-sid-file:module-revision':
                     revision_absent = False
-                    if not isinstance(item[key], str):
+                    if not isinstance(item[key], string_types):
                         raise SidFileError("invalid 'module-revision' value '%s'." % item[key])
 
                 else:
