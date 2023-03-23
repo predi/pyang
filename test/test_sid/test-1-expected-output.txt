@@ -93,3 +93,16 @@ OPTIONS
   $ pyang --sid-update-file toaster@2009-11-20.sid
           toaster@2009-12-28.yang --sid-extra-range count
 
+--sid-check-file-valid
+
+  The --sid-check-file-valid option can be used at any time to validate a .sid
+  file against a .yang file. Validates the structure of .sid file and ensures
+  that values such as identifiers in items reference definitions in .yang.
+
+  Two arguments are required to verify a .sid file; the filename of the .sid
+  file to be checked and the corresponding definition file.
+
+  For example:
+
+  $ pyang --sid-check-file-valid toaster@2009-12-28.sid toaster@2009-12-28.yang
+

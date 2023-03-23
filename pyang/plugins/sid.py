@@ -19,6 +19,7 @@ import copy
 from pyang import plugin
 from pyang import util
 from pyang import error
+from pyang import syntax
 
 try:
     string_types = basestring  # Python 2
@@ -65,6 +66,12 @@ class SidPlugin(plugin.PyangPlugin):
                                  type="string",
                                  dest="extra_sid_range",
                                  help="Add an extra SID range during a .sid file update."),
+            optparse.make_option("--sid-check-file-valid",
+                                 action="store",
+                                 type="string",
+                                 dest="check_sid_file_valid",
+                                 help="Check whether an existing .sid file is valid and "
+                                      "has been generated for .yang file(s)."),
             ]
 
         g = optparser.add_option_group("SID file specific options")
@@ -85,6 +92,8 @@ class SidPlugin(plugin.PyangPlugin):
         if ctx.opts.update_sid_file is not None:
             nbr_option_specified += 1
         if ctx.opts.check_sid_file is not None:
+            nbr_option_specified += 1
+        if ctx.opts.check_sid_file_valid is not None:
             nbr_option_specified += 1
         if nbr_option_specified == 0:
             return
@@ -130,6 +139,10 @@ class SidPlugin(plugin.PyangPlugin):
 
         if ctx.opts.list_sid:
             sid_file.list_content = True
+
+        if ctx.opts.check_sid_file_valid is not None:
+            sid_file.input_file_name = ctx.opts.check_sid_file_valid
+            sid_file.check_validity = True
 
         try:
             sid_file.process_sid_file(modules[0])
@@ -246,6 +259,19 @@ OPTIONS
 
   $ pyang --sid-update-file toaster@2009-11-20.sid
           toaster@2009-12-28.yang --sid-extra-range count
+
+--sid-check-file-valid
+
+  The --sid-check-file-valid option can be used at any time to validate a .sid
+  file against a .yang file. Validates the structure of .sid file and ensures
+  that values such as identifiers in items reference definitions in .yang.
+
+  Two arguments are required to verify a .sid file; the filename of the .sid
+  file to be checked and the corresponding definition file.
+
+  For example:
+
+  $ pyang --sid-check-file-valid toaster@2009-12-28.sid toaster@2009-12-28.yang
 """)
 
 ############################################################
@@ -272,6 +298,7 @@ class SidFile:
         self.module_name = ''
         self.module_revision = ''
         self.output_file_name = ''
+        self.check_validity = False
 
     def process_sid_file(self, module):
         self.module_name = module.i_modulename
@@ -293,8 +320,13 @@ class SidFile:
             # Upgrades can be removed after a reasonable transition period.
             self.upgrade_sid_file_format()
             self.validate_key_and_value()
+            if self.check_validity:
+                self.validate_against_module(module)
             self.validate_overlapping_ranges()
             self.validate_sid()
+
+            if self.check_validity:
+                return
 
         if self.extra_range is not None:
             if self.extra_range == 'count':
@@ -410,6 +442,11 @@ class SidFile:
             elif key == 'module-revision':
                 module_revision_absent = False
 
+            elif key == 'dependency-revision':
+                if not isinstance(self.content[key], list):
+                    raise SidFileError("key 'dependency-revision', invalid  value.")
+                self.validate_dependency_revisions(self.content[key])
+
             elif key == 'item':
                 items_absent = False
                 if not isinstance(self.content[key], list):
@@ -505,6 +542,30 @@ class SidFile:
         if sid_absent:
             raise SidFileError("mandatory field 'sid' not present")
 
+    def validate_dependency_revisions(self, items):
+        module_name_absent = True
+        revision_absent = True
+        for item in items:
+            for key in item:
+                if key == 'module-name':
+                    module_name_absent = False
+                    if not (isinstance(item[key], str)):
+                        raise SidFileError("invalid 'module-name' value '%s'." % item[key])
+
+                elif key == 'module-revision':
+                    revision_absent = False
+                    if not isinstance(item[key], str):
+                        raise SidFileError("invalid 'module-revision' value '%s'." % item[key])
+
+                else:
+                    raise SidFileError("invalid key '%s'." % key)
+
+        if module_name_absent:
+            raise SidFileError("mandatory field 'module-name' not present")
+
+        if revision_absent:
+            raise SidFileError("mandatory field 'module-revision' not present")
+
     ########################################################
     # Verify if each range defined in the .sid file is distinct
     def validate_overlapping_ranges(self):
@@ -540,6 +601,120 @@ class SidFile:
             if arange['entry-point'] <= sid < arange['entry-point'] + arange['size']:
                 return False
         return True
+
+    ########################################################
+    # Verify that all values that reference YANG definitions in the .sid file are valid.
+    def validate_against_module(self, module):
+        valid = True
+        name = self.content.get('module-name')
+        if name != module.arg:
+            valid = False
+            print("ERROR, Mismatch between the module name defined in the .sid file ('%s') and "
+                  "the .yang file ('%s')." % (name, module.arg))
+        revision = self.content.get('module-revision')
+        their_revision = util.get_latest_revision(module)
+        if revision != their_revision:
+            valid = False
+            print("ERROR, Mismatch between the module revision defined in the .sid file ('%s') and "
+                  "the .yang file ('%s')." % (revision, their_revision))
+        dependency_revision = self.content.get('dependency-revision')
+        if dependency_revision is not None:
+            for dep in dependency_revision:
+                name = dep.get('module-name')
+                revision = dep.get('module-revision')
+                key = (name, revision)
+                if key not in module.i_ctx.modules:
+                    print("WARNING, Dependency revision '%s%s'."
+                          % (name, ("@" + revision) if key is not None else ""))
+        elif module.search_one('import') is not None:
+            print("WARNING, Found at least one import statement in .yang file but no dependency"
+                  " revisions exist in .sid file")
+
+        module_or_submodule = []
+        for key in module.i_ctx.modules:
+            entry = module.i_ctx.modules[key]
+            if entry.keyword == 'submodule' or entry == module:
+                module_or_submodule.append(entry.arg)
+        for item in self.content['item']:
+            namespace = item.get('namespace')
+            identifier = item.get('identifier')
+            if 'module' == namespace:
+                if identifier not in module_or_submodule:
+                    valid = False
+                    print("ERROR, Item '%s' (%s) does not match any module or submodule." %
+                          (identifier, namespace))
+            elif 'feature' == namespace:
+                if identifier not in module.i_features:
+                    valid = False
+                    print("ERROR, Item '%s' (%s) does not match any feature." %
+                          (identifier, namespace))
+            elif 'identity' == namespace:
+                if identifier not in module.i_identities:
+                    valid = False
+                    print("ERROR, Item '%s' (%s) does not match any feature." %
+                          (identifier, namespace))
+            elif 'data' == namespace:
+                if not self.check_data_identifier(identifier, module):
+                    valid = False
+
+        if not valid:
+            raise SidFileError(".sid file does not match .yang file.")
+        else:
+            print("Check complete: .sid file matches .yang file.")
+
+    def check_data_identifier(self, identifier, module):
+        # this is a variant of statements.find_target_node(...)
+        valid = True
+        # parse the path into a list of two-tuples of (prefix,identifier)
+        path = [(m[1], m[2]) for m in syntax.re_schema_node_id_part.findall(identifier)]
+        if len(path) == 0:
+            valid = False
+            print("ERROR, Item '%s' (%s) not a valid schema node identifier."
+                  % (identifier, 'data'))
+        schema_node_module = None
+        schema_node = None
+        for module_name, name in path:
+            if schema_node_module is None and module_name == '':
+                valid = False
+                print("ERROR, Item '%s' (%s) does not match an existing schema node - missing "
+                      "module prefix in '%s'." % (identifier, 'data', "/" + name))
+                break
+            if module_name != '' and (
+                    schema_node_module is None or schema_node_module.arg != module_name):
+                schema_node_module = module.i_ctx.get_module(module_name)
+                if schema_node_module is None:
+                    valid = False
+                    print("ERROR, Item '%s' (%s) does not match an existing schema node - "
+                          "module '%s' in  '%s' not found."
+                          % (identifier, 'data', module_name, "/" + module_name + ":" + name))
+                    break
+                if schema_node is None:
+                    schema_node = schema_node_module
+            schema_node = self.find_schema_node_child(name, schema_node, schema_node_module)
+            if schema_node is None:
+                valid = False
+                print(
+                    "ERROR, Item '%s' (%s) does not match an existing schema node - name '%s' in "
+                    "'%s' not found."
+                    % (identifier, 'data', module_name, "/" + module_name + ":" + name))
+                break
+
+        if valid and not self.is_from_same_namespace(schema_node, module):
+            valid = False
+            print("ERROR, Item '%s' (%s) does not identify a schema node from .yang file."
+                  % (identifier, 'data'))
+
+        return valid
+
+    def find_schema_node_child(self, name, parent, module):
+        child = None
+        if hasattr(parent, 'i_children'):
+            for candidate in parent.i_children:
+                if name == candidate.arg and \
+                        self.is_from_same_namespace(candidate, module):
+                    child = candidate
+                    break
+        return child
 
     # Keywords that represent schema node items
     schema_node_keywords = ('action', 'container', 'leaf', 'leaf-list', 'list', 'choice', 'case',
@@ -859,6 +1034,9 @@ class SidFile:
     node_keywords = ('node', 'notification', 'rpc', 'action')
 
     def upgrade_sid_file_format(self):
+        if self.check_validity:
+            return  # no fixes when checking whether .sid file valid
+
         items = self.content.get('items')
         if not items:
             return
