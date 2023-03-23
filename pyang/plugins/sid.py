@@ -319,7 +319,9 @@ class SidFile:
                 self.content = json.load(f, object_pairs_hook=collections.OrderedDict)
             # Upgrades can be removed after a reasonable transition period.
             self.upgrade_sid_file_format()
+            self.strip_wrapper()
             self.validate_key_and_value()
+            self.normalize_key_names(self.content)
             if self.check_validity:
                 self.validate_against_module(module)
             self.validate_overlapping_ranges()
@@ -422,6 +424,24 @@ class SidFile:
                 self.is_consistent = False
 
     ########################################################
+    # Verify that .sid file contains a single top-level JSON object, named "ietf-sid-file:sid-file".
+    def strip_wrapper(self):
+        sid_file_absent = True
+        for key in self.content:
+            if key == 'ietf-sid-file:sid-file':
+                sid_file_absent = False
+                if not isinstance(self.content[key], collections.OrderedDict):
+                    raise SidFileError("key 'ietf-sid-file:sid-file', invalid value.")
+                self.content = self.content[key]  # strip wrapper
+                break
+
+            else:
+                raise SidFileError("invalid field '%s'." % key)
+
+        if sid_file_absent:
+            raise SidFileError("mandatory object 'ietf-sid-file:sid-file' not present")
+
+    ########################################################
     # Verify the tag and data type of each .sid file JSON object
     def validate_key_and_value(self):
         assignment_ranges_absent = True
@@ -430,24 +450,27 @@ class SidFile:
         items_absent = True
 
         for key in self.content:
-            if key == 'assignment-range':
+            if key == 'assignment-range' or key == 'ietf-sid-file:assignment-range':
                 assignment_ranges_absent = False
                 if not isinstance(self.content[key], list):
                     raise SidFileError("key 'assignment-range', invalid  value.")
                 self.validate_ranges(self.content[key])
 
-            elif key == 'module-name':
+            elif key == 'module-name' or key == 'ietf-sid-file:module-name':
                 module_name_absent = False
 
-            elif key == 'module-revision':
+            elif key == 'module-revision' or key == 'ietf-sid-file:module-revision':
                 module_revision_absent = False
 
-            elif key == 'dependency-revision':
+            elif key == 'description' or key == 'ietf-sid-file:description':
+                pass
+
+            elif key == 'dependency-revision' or key == 'ietf-sid-file:dependency-revision':
                 if not isinstance(self.content[key], list):
                     raise SidFileError("key 'dependency-revision', invalid  value.")
                 self.validate_dependency_revisions(self.content[key])
 
-            elif key == 'item':
+            elif key == 'item' or key == 'ietf-sid-file:item':
                 items_absent = False
                 if not isinstance(self.content[key], list):
                     raise SidFileError("key 'item', invalid value.")
@@ -468,6 +491,24 @@ class SidFile:
         if items_absent:
             raise SidFileError("mandatory field 'item' not present")
 
+    def normalize_key_names(self, mapping):
+        # goes through entire content recursively and replaces qualified key names with short
+        # versions, for example 'ietf-sid-file:module-name' --> 'module-name'
+        for _ in range(len(mapping)):
+            k, v = mapping.popitem(False)
+            components = k.split(':')
+            if len(components) == 2 and components[0] == 'ietf-sid-file':
+                old = k
+                new = components[1]
+            else:
+                old = k
+                new = k
+
+            mapping[new if old == k else k] = v
+            if isinstance(v, list):  # we only have leaf and list entries in there
+                for entry in v:
+                    self.normalize_key_names(entry)
+
     @staticmethod
     def validate_ranges(ranges):
         entry_point_absent = True
@@ -475,7 +516,7 @@ class SidFile:
 
         for arange in ranges:
             for key in arange:
-                if key == 'entry-point':
+                if key == 'entry-point' or key == 'ietf-sid-file:entry-point':
                     entry_point_absent = False
                     if not isinstance(arange[key], string_types):  # YANG uint64 value
                         raise SidFileError("invalid 'entry-point' value '%s'." % arange[key])
@@ -484,7 +525,7 @@ class SidFile:
                     except ValueError:
                         raise SidFileError("invalid 'entry-point' value '%s'." % arange[key])
 
-                elif key == 'size':
+                elif key == 'size' or key == 'ietf-sid-file:size':
                     size_absent = False
                     if not isinstance(arange[key], string_types):  # YANG uint64 value
                         raise SidFileError("invalid 'size' value '%s'." % arange[key])
@@ -510,18 +551,18 @@ class SidFile:
         sid_absent = True
         for item in items:
             for key in item:
-                if key == 'namespace':
+                if key == 'namespace' or key == 'ietf-sid-file:namespace':
                     namespace_absent = False
                     if not (isinstance(item[key], str)
                             and item[key].endswith(self.namespace_ends)):
                         raise SidFileError("invalid 'namespace' value '%s'." % item[key])
 
-                elif key == 'identifier':
+                elif key == 'identifier' or key == 'ietf-sid-file:identifier':
                     identifier_absent = False
                     if not isinstance(item[key], str):
                         raise SidFileError("invalid 'identifier' value '%s'." % item[key])
 
-                elif key == 'sid':
+                elif key == 'sid' or key == 'ietf-sid-file:sid':
                     sid_absent = False
                     if not isinstance(item[key], string_types):  # YANG uint64 value
                         raise SidFileError("invalid 'sid' value '%s'." % item[key])
@@ -547,12 +588,12 @@ class SidFile:
         revision_absent = True
         for item in items:
             for key in item:
-                if key == 'module-name':
+                if key == 'module-name' or key == 'ietf-sid-file:module-name':
                     module_name_absent = False
                     if not (isinstance(item[key], str)):
                         raise SidFileError("invalid 'module-name' value '%s'." % item[key])
 
-                elif key == 'module-revision':
+                elif key == 'module-revision' or key == 'ietf-sid-file:module-revision':
                     revision_absent = False
                     if not isinstance(item[key], str):
                         raise SidFileError("invalid 'module-revision' value '%s'." % item[key])
@@ -624,7 +665,7 @@ class SidFile:
                 revision = dep.get('module-revision')
                 key = (name, revision)
                 if key not in module.i_ctx.modules:
-                    print("WARNING, Dependency revision '%s%s'."
+                    print("WARNING, Dependency revision '%s%s' not found."
                           % (name, ("@" + revision) if key is not None else ""))
         elif module.search_one('import') is not None:
             print("WARNING, Found at least one import statement in .yang file but no dependency"
@@ -694,9 +735,8 @@ class SidFile:
             if schema_node is None:
                 valid = False
                 print(
-                    "ERROR, Item '%s' (%s) does not match an existing schema node - name '%s' in "
-                    "'%s' not found."
-                    % (identifier, 'data', module_name, "/" + module_name + ":" + name))
+                    "ERROR, Item '%s' (%s) does not match an existing schema node - name '%s' not "
+                    "found." % (identifier, 'data', name))
                 break
 
         if valid and not self.is_from_same_namespace(schema_node, module):
@@ -935,14 +975,19 @@ class SidFile:
             os.remove(self.output_file_name)
 
         with open(self.output_file_name, 'w') as outfile:
-            json.dump(
-                self.reorder_per_yang_model(self.stringify_yang_uint64_values()), outfile, indent=2)
+            json.dump(self.preprocess_content(), outfile, indent=2)
 
     ########################################################
-    def stringify_yang_uint64_values(self):
+    def preprocess_content(self):
         # leaves self.content intact, since it is needed later
-        stringified = copy.deepcopy(self.content)
-        return self.convert_yang_uin64_values(stringified)
+        preprocessed = copy.deepcopy(self.content)
+        # convert internal values to proper ones
+        preprocessed = self.convert_yang_uin64_values(preprocessed)
+        # reorder
+        preprocessed = self.reorder_per_yang_model(preprocessed)
+        # add wrapper
+        preprocessed = collections.OrderedDict([('ietf-sid-file:sid-file', preprocessed)])
+        return preprocessed
 
     ########################################################
     @staticmethod
@@ -1074,3 +1119,7 @@ class SidFile:
         # p2. The following method call tolerates such legacy files by converting all invalid values
         # into expected ones.
         self.convert_yang_uin64_values(self.content)
+
+        # legacy .sid files did not contain the 'ietf-sid-file:sid-file' wrapper, this adds one
+        if self.content.get('module-name') is not None:
+            self.content = collections.OrderedDict([('ietf-sid-file:sid-file', self.content)])

@@ -1,96 +1,98 @@
 {
-  "module-name": "ietf-constrained-voucher",
-  "module-revision": "2019-08-01",
-  "dependency-revision": [
-    {
-      "module-name": "ietf-restconf",
-      "module-revision": "2017-01-26"
-    },
-    {
-      "module-name": "ietf-voucher",
-      "module-revision": "2018-05-09"
-    },
-    {
-      "module-name": "ietf-yang-types",
-      "module-revision": "2013-07-15"
-    }
-  ],
-  "assignment-range": [
-    {
-      "entry-point": "2500",
-      "size": "50"
-    }
-  ],
-  "item": [
-    {
-      "namespace": "module",
-      "identifier": "ietf-constrained-voucher",
-      "sid": "2500"
-    },
-    {
-      "namespace": "data",
-      "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact",
-      "sid": "2501"
-    },
-    {
-      "namespace": "data",
-      "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher",
-      "sid": "2502"
-    },
-    {
-      "namespace": "data",
-      "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/assertion",
-      "sid": "2503"
-    },
-    {
-      "namespace": "data",
-      "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/created-on",
-      "sid": "2504"
-    },
-    {
-      "namespace": "data",
-      "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/domain-cert-revocation-checks",
-      "sid": "2505"
-    },
-    {
-      "namespace": "data",
-      "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/expires-on",
-      "sid": "2506"
-    },
-    {
-      "namespace": "data",
-      "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/idevid-issuer",
-      "sid": "2507"
-    },
-    {
-      "namespace": "data",
-      "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/last-renewal-date",
-      "sid": "2508"
-    },
-    {
-      "namespace": "data",
-      "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/nonce",
-      "sid": "2509"
-    },
-    {
-      "namespace": "data",
-      "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/pinned-domain-cert",
-      "sid": "2510"
-    },
-    {
-      "namespace": "data",
-      "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/pinned-domain-subject-public-key-info",
-      "sid": "2511"
-    },
-    {
-      "namespace": "data",
-      "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/pinned-sha256-of-subject-public-key-info",
-      "sid": "2512"
-    },
-    {
-      "namespace": "data",
-      "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/serial-number",
-      "sid": "2513"
-    }
-  ]
+  "ietf-sid-file:sid-file": {
+    "module-name": "ietf-constrained-voucher",
+    "module-revision": "2019-08-01",
+    "dependency-revision": [
+      {
+        "module-name": "ietf-restconf",
+        "module-revision": "2017-01-26"
+      },
+      {
+        "module-name": "ietf-voucher",
+        "module-revision": "2018-05-09"
+      },
+      {
+        "module-name": "ietf-yang-types",
+        "module-revision": "2013-07-15"
+      }
+    ],
+    "assignment-range": [
+      {
+        "entry-point": "2500",
+        "size": "50"
+      }
+    ],
+    "item": [
+      {
+        "namespace": "module",
+        "identifier": "ietf-constrained-voucher",
+        "sid": "2500"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact",
+        "sid": "2501"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher",
+        "sid": "2502"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/assertion",
+        "sid": "2503"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/created-on",
+        "sid": "2504"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/domain-cert-revocation-checks",
+        "sid": "2505"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/expires-on",
+        "sid": "2506"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/idevid-issuer",
+        "sid": "2507"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/last-renewal-date",
+        "sid": "2508"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/nonce",
+        "sid": "2509"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/pinned-domain-cert",
+        "sid": "2510"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/pinned-domain-subject-public-key-info",
+        "sid": "2511"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/pinned-sha256-of-subject-public-key-info",
+        "sid": "2512"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-constrained-voucher:voucher-constrained-artifact/voucher/serial-number",
+        "sid": "2513"
+      }
+    ]
+  }
 }
