@@ -1,4 +1,6 @@
-test: test1 test2 test3 test3legacy test4 test5 test6 test7 test8 test9 test10 test11 test12 test14 test15 test16 test17 test18 test19 test20
+test: test1 test2 test3 test3legacy test4 test5 test6 test7 test8 test9 test10 test11 test12 test14 test15 test16 \
+      test17 test18 test19 test20 test21 test22
+
 test1:
 	# Test help
 	$(PYANG) --sid-help 2>&1 | diff -b test-1-expected-output.txt -
@@ -101,3 +103,20 @@ test20:
 	$(PYANG) --sid-generate-file 60000:100 ieee802-dot1q-psfp@2020-07-07.yang 2>&1 | diff -b test-20-expected-output.txt -
 	diff -b test-20-expected-ieee802-dot1q-psfp@2020-07-07.sid ieee802-dot1q-psfp@2020-07-07.sid
 	rm ieee802-dot1q-psfp@2020-07-07.sid
+
+test21:
+	# Test check sid file valid
+	$(PYANG) --sid-list --sid-generate-file 1700:100 ietf-system@2014-08-06.yang 2>&1 | diff -b test-21-expected-output.txt -
+	diff -b test-21-expected-ietf-system@2014-08-06.sid ietf-system@2014-08-06.sid
+	$(PYANG) --sid-check-file-valid ietf-system@2014-08-06.sid ietf-system@2014-08-06.yang 2>test21-stderr.txt 1>test21-stdout.txt
+	diff -b test-21b-expected-output.txt test21-stderr.txt
+	diff -b test-21c-expected-output.txt test21-stdout.txt
+	rm -f ietf-system@2014-08-06.sid test21-stderr.txt test21-stdout.txt
+
+test22:
+	# Test check sid file valid, for the example in draft-ietf-core-sid-20
+	cp test-draft-core-sid-20-example-ietf-system@2014-08-06.sid ietf-system@2014-08-06.sid
+	$(PYANG) --sid-check-file-valid ietf-system@2014-08-06.sid ietf-system@2014-08-06.yang 2>test22-stderr.txt 1>test22-stdout.txt | cat
+	diff -b test-22b-expected-output.txt test22-stderr.txt
+	diff -b test-22c-expected-output.txt test22-stdout.txt
+	rm -f ietf-system@2014-08-06.sid test22-stderr.txt test22-stdout.txt

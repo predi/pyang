@@ -1,0 +1,13 @@
+ERROR, Item '/ietf-system:set-current-datetime/current-datetime' (data) does not match an existing schema node - name 'current-datetime' not found.
+ERROR, Item '/ietf-system:system/clock/timezone-name' (data) does not match an existing schema node - name 'timezone-name' not found.
+ERROR, Item '/ietf-system:system/clock/timezone-utc-offset' (data) does not match an existing schema node - name 'timezone-utc-offset' not found.
+ERROR, Item '/ietf-system:system/dns-resolver/server/udp-and-tcp' (data) does not match an existing schema node - name 'udp-and-tcp' not found.
+ERROR, Item '/ietf-system:system/dns-resolver/server/udp-and-tcp/address' (data) does not match an existing schema node - name 'udp-and-tcp' not found.
+ERROR, Item '/ietf-system:system/dns-resolver/server/udp-and-tcp/port' (data) does not match an existing schema node - name 'udp-and-tcp' not found.
+ERROR, Item '/ietf-system:system/ntp/server/udp' (data) does not match an existing schema node - name 'udp' not found.
+ERROR, Item '/ietf-system:system/ntp/server/udp/address' (data) does not match an existing schema node - name 'udp' not found.
+ERROR, Item '/ietf-system:system/ntp/server/udp/port' (data) does not match an existing schema node - name 'udp' not found.
+ERROR, Item '/ietf-system:system/radius/server/udp' (data) does not match an existing schema node - name 'udp' not found.
+ERROR, Item '/ietf-system:system/radius/server/udp/address' (data) does not match an existing schema node - name 'udp' not found.
+ERROR, Item '/ietf-system:system/radius/server/udp/authentication-port' (data) does not match an existing schema node - name 'udp' not found.
+ERROR, Item '/ietf-system:system/radius/server/udp/shared-secret' (data) does not match an existing schema node - name 'udp' not found.
