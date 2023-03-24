@@ -124,6 +124,6 @@ test22:
 test23:
 	# Test update sid file (legacy JSON format, remove when SidPlugin.upgrade_sid_file_format() is removed)
 	cp test-23-ietf-system-legacy@2014-08-06.sid ietf-system@2014-08-06.sid
-	$(PYANG) --sid-update-file ietf-system@2014-08-06.sid ietf-system@2014-08-06.yang 2>&1 | diff -b test-23-expected-output.txt -
+	$(PYANG) --sid-list --sid-update-file ietf-system@2014-08-06.sid ietf-system@2014-08-06.yang 2>&1 | diff -b test-23-expected-output.txt -
 	diff -b test-23-expected-ietf-system@2014-08-06.sid ietf-system@2014-08-06.sid
 	rm -f ietf-system@2014-08-06.sid

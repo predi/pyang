@@ -1,4 +1,97 @@
 
+SID        Assigned to
+---------  --------------------------------------------------
+1700       module ietf-system
+1701       identity authentication-method
+1702       identity local-users
+1703       identity radius
+1704       identity radius-authentication-type
+1705       identity radius-chap
+1706       identity radius-pap
+1707       feature authentication
+1708       feature dns-udp-tcp-port
+1709       feature local-users
+1710       feature ntp
+1711       feature ntp-udp-port
+1712       feature radius
+1713       feature radius-authentication
+1714       feature timezone-name
+1715       data /ietf-system:set-current-datetime
+1775       data /ietf-system:set-current-datetime/input (New)
+1716       data /ietf-system:set-current-datetime/input/current-datetime
+1776       data /ietf-system:set-current-datetime/output (New)
+1717       data /ietf-system:system
+1718       data /ietf-system:system-restart
+1777       data /ietf-system:system-restart/input (New)
+1778       data /ietf-system:system-restart/output (New)
+1719       data /ietf-system:system-shutdown
+1779       data /ietf-system:system-shutdown/input (New)
+1780       data /ietf-system:system-shutdown/output (New)
+1720       data /ietf-system:system-state
+1721       data /ietf-system:system-state/clock
+1722       data /ietf-system:system-state/clock/boot-datetime
+1723       data /ietf-system:system-state/clock/current-datetime
+1724       data /ietf-system:system-state/platform
+1725       data /ietf-system:system-state/platform/machine
+1726       data /ietf-system:system-state/platform/os-name
+1727       data /ietf-system:system-state/platform/os-release
+1728       data /ietf-system:system-state/platform/os-version
+1729       data /ietf-system:system/authentication
+1730       data /ietf-system:system/authentication/user
+1731       data /ietf-system:system/authentication/user-authentication-order
+1732       data /ietf-system:system/authentication/user/authorized-key
+1733       data /ietf-system:system/authentication/user/authorized-key/algorithm
+1734       data /ietf-system:system/authentication/user/authorized-key/key-data
+1735       data /ietf-system:system/authentication/user/authorized-key/name
+1736       data /ietf-system:system/authentication/user/name
+1737       data /ietf-system:system/authentication/user/password
+1738       data /ietf-system:system/clock
+1781       data /ietf-system:system/clock/timezone (New)
+1782       data /ietf-system:system/clock/timezone/timezone-name (New)
+1739       data /ietf-system:system/clock/timezone/timezone-name/timezone-name
+1783       data /ietf-system:system/clock/timezone/timezone-utc-offset (New)
+1740       data /ietf-system:system/clock/timezone/timezone-utc-offset/timezone-utc-offset
+1741       data /ietf-system:system/contact
+1742       data /ietf-system:system/dns-resolver
+1743       data /ietf-system:system/dns-resolver/options
+1744       data /ietf-system:system/dns-resolver/options/attempts
+1745       data /ietf-system:system/dns-resolver/options/timeout
+1746       data /ietf-system:system/dns-resolver/search
+1747       data /ietf-system:system/dns-resolver/server
+1748       data /ietf-system:system/dns-resolver/server/name
+1784       data /ietf-system:system/dns-resolver/server/transport (New)
+1785       data /ietf-system:system/dns-resolver/server/transport/udp-and-tcp (New)
+1749       data /ietf-system:system/dns-resolver/server/transport/udp-and-tcp/udp-and-tcp
+1750       data /ietf-system:system/dns-resolver/server/transport/udp-and-tcp/udp-and-tcp/address
+1751       data /ietf-system:system/dns-resolver/server/transport/udp-and-tcp/udp-and-tcp/port
+1752       data /ietf-system:system/hostname
+1753       data /ietf-system:system/location
+1754       data /ietf-system:system/ntp
+1755       data /ietf-system:system/ntp/enabled
+1756       data /ietf-system:system/ntp/server
+1757       data /ietf-system:system/ntp/server/association-type
+1758       data /ietf-system:system/ntp/server/iburst
+1759       data /ietf-system:system/ntp/server/name
+1760       data /ietf-system:system/ntp/server/prefer
+1786       data /ietf-system:system/ntp/server/transport (New)
+1787       data /ietf-system:system/ntp/server/transport/udp (New)
+1761       data /ietf-system:system/ntp/server/transport/udp/udp
+1762       data /ietf-system:system/ntp/server/transport/udp/udp/address
+1763       data /ietf-system:system/ntp/server/transport/udp/udp/port
+1764       data /ietf-system:system/radius
+1765       data /ietf-system:system/radius/options
+1766       data /ietf-system:system/radius/options/attempts
+1767       data /ietf-system:system/radius/options/timeout
+1768       data /ietf-system:system/radius/server
+1769       data /ietf-system:system/radius/server/authentication-type
+1770       data /ietf-system:system/radius/server/name
+1788       data /ietf-system:system/radius/server/transport (New)
+1789       data /ietf-system:system/radius/server/transport/udp (New)
+1771       data /ietf-system:system/radius/server/transport/udp/udp
+1772       data /ietf-system:system/radius/server/transport/udp/udp/address
+1773       data /ietf-system:system/radius/server/transport/udp/udp/authentication-port
+1774       data /ietf-system:system/radius/server/transport/udp/udp/shared-secret
+
 File ietf-system@2014-08-06.sid updated
 Number of SIDs available : 100
 Number of SIDs used : 90
