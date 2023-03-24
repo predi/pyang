@@ -318,7 +318,7 @@ class SidFile:
             with open(self.input_file_name) as f:
                 self.content = json.load(f, object_pairs_hook=collections.OrderedDict)
             # Upgrades can be removed after a reasonable transition period.
-            self.upgrade_sid_file_format()
+            self.upgrade_sid_file_format(module)
             self.strip_wrapper()
             self.validate_key_and_value()
             self.normalize_key_names(self.content)
@@ -1090,7 +1090,7 @@ class SidFile:
 
     node_keywords = ('node', 'notification', 'rpc', 'action')
 
-    def upgrade_sid_file_format(self):
+    def upgrade_sid_file_format(self, module):
         if self.check_validity:
             return  # no fixes when checking whether .sid file valid
 
@@ -1134,4 +1134,64 @@ class SidFile:
 
         # legacy .sid files did not contain the 'ietf-sid-file:sid-file' wrapper, this adds one
         if self.content.get('module-name') is not None:
+            self.convert_legacy_paths_to_schema_node_paths(module)
             self.content = collections.OrderedDict([('ietf-sid-file:sid-file', self.content)])
+
+    def convert_legacy_paths_to_schema_node_paths(self, module):
+        # remove this method when upgrade_sid_file_format() is removed
+
+        # legacy files did not emit choice and case nodes, rc:yang-data, etc. (except input/output)
+        # this attempts to convert those paths into schema node identifiers
+        items = self.content.get('item')
+        if isinstance(items, list):
+            for item in items:
+                if isinstance(item, collections.OrderedDict) and item.get('namespace') == 'data':
+                    path = item.get('identifier')
+                    if path is not None and isinstance(path, string_types):
+                        node = self.find_node_for_legacy_path(path, module)
+                        if node is not None:
+                            converted_path = self.get_path_to_root(node)
+                            if converted_path != path:
+                                item['identifier'] = converted_path
+
+    def find_node_for_legacy_path(self, identifier, module):
+        # remove this method when upgrade_sid_file_format() is removed
+        valid = True
+        path = [(m[1], m[2]) for m in syntax.re_schema_node_id_part.findall(identifier)]
+        schema_node_module = None
+        schema_node = None
+        for module_name, name in path:
+            if schema_node_module is None and module_name == '':
+                valid = False
+                break
+            if module_name != '' and (
+                    schema_node_module is None or schema_node_module.arg != module_name):
+                schema_node_module = module.i_ctx.get_module(module_name)
+                if schema_node_module is None:
+                    valid = False
+                    break
+                if schema_node is None:
+                    schema_node = schema_node_module
+            schema_node = self.find_data_node_child(name, schema_node, schema_node_module)
+            if schema_node is None:
+                valid = False
+                break
+
+        return schema_node if valid else None
+
+    ignorable_legacy_keywords = ('case', 'choice', ('ietf-restconf', 'yang-data'))
+
+    def find_data_node_child(self, name, parent, module):
+        # remove this method when upgrade_sid_file_format() is removed
+        child = None
+        if hasattr(parent, 'i_children'):
+            for candidate in parent.i_children:
+                if candidate.keyword in self.ignorable_legacy_keywords:
+                    child = self.find_data_node_child(name, candidate, module)
+                    if child is not None:
+                        break
+                elif name == candidate.arg and \
+                        self.is_from_same_namespace(candidate, module):
+                    child = candidate
+                    break
+        return child

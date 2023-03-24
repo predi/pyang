@@ -1,5 +1,5 @@
 test: test1 test2 test3 test3legacy test4 test5 test6 test7 test8 test9 test10 test11 test12 test14 test15 test16 \
-      test17 test18 test19 test20 test21 test22
+      test17 test18 test19 test20 test21 test22 test23
 
 test1:
 	# Test help
@@ -108,7 +108,7 @@ test21:
 	# Test check sid file valid
 	$(PYANG) --sid-list --sid-generate-file 1700:100 ietf-system@2014-08-06.yang 2>&1 | diff -b test-21-expected-output.txt -
 	diff -b test-21-expected-ietf-system@2014-08-06.sid ietf-system@2014-08-06.sid
-	$(PYANG) --sid-check-file-valid ietf-system@2014-08-06.sid ietf-system@2014-08-06.yang 2>test21-stderr.txt 1>test21-stdout.txt
+	$(PYANG) --sid-check-file-valid ietf-system@2014-08-06.sid ietf-system@2014-08-06.yang 2>test21-stderr.txt 1>test21-stdout.txt | cat
 	diff -b test-21b-expected-output.txt test21-stderr.txt
 	diff -b test-21c-expected-output.txt test21-stdout.txt
 	rm -f ietf-system@2014-08-06.sid test21-stderr.txt test21-stdout.txt
@@ -120,3 +120,10 @@ test22:
 	diff -b test-22b-expected-output.txt test22-stderr.txt
 	diff -b test-22c-expected-output.txt test22-stdout.txt
 	rm -f ietf-system@2014-08-06.sid test22-stderr.txt test22-stdout.txt
+
+test23:
+	# Test update sid file (legacy JSON format, remove when SidPlugin.upgrade_sid_file_format() is removed)
+	cp test-23-ietf-system-legacy@2014-08-06.sid ietf-system@2014-08-06.sid
+	$(PYANG) --sid-update-file ietf-system@2014-08-06.sid ietf-system@2014-08-06.yang 2>&1 | diff -b test-23-expected-output.txt -
+	diff -b test-23-expected-ietf-system@2014-08-06.sid ietf-system@2014-08-06.sid
+	rm -f ietf-system@2014-08-06.sid
