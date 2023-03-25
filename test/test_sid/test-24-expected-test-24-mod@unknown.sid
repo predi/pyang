@@ -1,0 +1,44 @@
+{
+  "ietf-sid-file:sid-file": {
+    "module-name": "test-24-mod",
+    "module-revision": "unknown",
+    "assignment-range": [
+      {
+        "entry-point": "20000",
+        "size": "25"
+      }
+    ],
+    "item": [
+      {
+        "namespace": "module",
+        "identifier": "test-24-mod",
+        "sid": "20000"
+      },
+      {
+        "namespace": "module",
+        "identifier": "test-24-sub",
+        "sid": "20001"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/test-24-mod:top",
+        "sid": "20002"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/test-24-mod:top-state",
+        "sid": "20003"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/test-24-mod:top/item",
+        "sid": "20004"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/test-24-mod:top/item/name",
+        "sid": "20005"
+      }
+    ]
+  }
+}

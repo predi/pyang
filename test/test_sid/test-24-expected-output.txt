@@ -1,0 +1,13 @@
+
+SID        Assigned to
+---------  --------------------------------------------------
+20000      module test-24-mod
+20001      module test-24-sub
+20002      data /test-24-mod:top
+20003      data /test-24-mod:top-state
+20004      data /test-24-mod:top/item
+20005      data /test-24-mod:top/item/name
+
+File test-24-mod@unknown.sid created
+Number of SIDs available : 25
+Number of SIDs used : 6

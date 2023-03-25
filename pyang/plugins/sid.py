@@ -122,6 +122,7 @@ class SidPlugin(plugin.PyangPlugin):
 
         if ctx.opts.update_sid_file is not None:
             sid_file.input_file_name = ctx.opts.update_sid_file
+            sid_file.update_file = True
 
         if ctx.opts.check_sid_file is not None:
             sid_file.input_file_name = ctx.opts.check_sid_file
@@ -299,6 +300,7 @@ class SidFile:
         self.module_revision = ''
         self.output_file_name = ''
         self.check_validity = False
+        self.update_file = False
 
     def process_sid_file(self, module):
         self.module_name = module.i_modulename
@@ -370,6 +372,14 @@ class SidFile:
             self.list_all_items()
         else:
             self.list_deleted_items()
+
+        if self.update_file:
+            version = self.content.get('sid-file-version')
+            if version is None:
+                version = 1
+            else:
+                version = version + 1
+            self.content['sid-file-version'] = version
 
         if self.check_consistency:
             if self.is_consistent:
@@ -734,7 +744,7 @@ class SidFile:
                 break
             if module_name != '' and (
                     schema_node_module is None or schema_node_module.arg != module_name):
-                schema_node_module = module.i_ctx.get_module(module_name)
+                schema_node_module = self.get_module_by_name(module_name, module)
                 if schema_node_module is None:
                     valid = False
                     print("ERROR, Item '%s' (%s) does not match an existing schema node - "
@@ -767,6 +777,21 @@ class SidFile:
                     child = candidate
                     break
         return child
+
+    @staticmethod
+    def get_module_by_name(module_name, module):
+        revisions = []
+        for (name, revision) in module.i_ctx.modules:
+            if name == module_name:
+                revisions.append(revision)
+
+        if len(revisions) == 1:
+            key = (module_name, revisions[0])
+        else:
+            revision = max(revisions)
+            key = (module_name, revision)
+
+        return module.i_ctx.modules[key]
 
     # Keywords that represent schema node items
     schema_node_keywords = ('action', 'container', 'leaf', 'leaf-list', 'list', 'choice', 'case',
@@ -824,7 +849,7 @@ class SidFile:
             if (substmt.keyword == 'augment' or self.is_augment_structure_extension(substmt))\
                     and hasattr(substmt, 'i_target_node'):
                 self.iterate_schema_nodes(
-                    substmt.i_target_node, module, self.get_path_to_root(substmt.i_target_node))
+                    substmt.i_target_node, module, self.get_path_to_root(substmt.i_target_node, module))
 
     def iterate_schema_nodes(self, parent, module, path):
         if not hasattr(parent, 'i_children'):
@@ -836,7 +861,7 @@ class SidFile:
             if schema_node.i_module is not None \
                     and self.is_from_same_namespace(schema_node, module) \
                     and schema_node.keyword in self.schema_node_keywords:
-                new_path = self.add_to_path(schema_node, parent, path)
+                new_path = self.add_to_path(schema_node, parent, module, path)
                 self.merge_item('data', new_path)
                 self.iterate_schema_nodes(schema_node, module, new_path)
 
@@ -846,15 +871,24 @@ class SidFile:
                 schema_node.i_module.i_including_modulename) == module
         return schema_node.i_module == module
 
-    def add_to_path(self, schema_node, parent, prefix=""):
-        if prefix == "" or schema_node.i_module != parent.i_module:
-            path = "/" + schema_node.i_module.arg + ":" + schema_node.arg
+    def add_to_path(self, schema_node, parent, module, prefix=""):
+        main_module = self.get_main_module(schema_node, module)
+        if prefix == "" or main_module != self.get_main_module(parent, module):
+            path = "/" + main_module.arg + ":" + schema_node.arg
         else:
             path = "/" + schema_node.arg
 
         return prefix + path
 
-    def get_path_to_root(self, schema_node):
+    def get_main_module(self, schema_node, module):
+        if schema_node.i_module.keyword == 'submodule':
+            main_module = self.get_module_by_name(schema_node.i_module.i_including_modulename, module)
+        else:
+            main_module = schema_node.i_module
+
+        return main_module
+
+    def get_path_to_root(self, schema_node, module):
         path_components = []
 
         while schema_node is not None:
@@ -869,7 +903,7 @@ class SidFile:
                 pass  # module/submodule
             else:
                 parent = path_components[i + 1]
-                path = self.add_to_path(node, parent, path)
+                path = self.add_to_path(node, parent, module, path)
 
         return path
 
@@ -1150,7 +1184,7 @@ class SidFile:
                     if path is not None and isinstance(path, string_types):
                         node = self.find_node_for_legacy_path(path, module)
                         if node is not None:
-                            converted_path = self.get_path_to_root(node)
+                            converted_path = self.get_path_to_root(node, module)
                             if converted_path != path:
                                 item['identifier'] = converted_path
 
@@ -1166,7 +1200,7 @@ class SidFile:
                 break
             if module_name != '' and (
                     schema_node_module is None or schema_node_module.arg != module_name):
-                schema_node_module = module.i_ctx.get_module(module_name)
+                schema_node_module = self.get_module_by_name(module_name, module)
                 if schema_node_module is None:
                     valid = False
                     break
