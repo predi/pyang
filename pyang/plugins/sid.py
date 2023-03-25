@@ -866,10 +866,8 @@ class SidFile:
                 self.iterate_schema_nodes(schema_node, module, new_path)
 
     def is_from_same_namespace(self, schema_node, module):
-        if schema_node.i_module.keyword == 'submodule':
-            return schema_node.i_module.i_ctx.get_module(
-                schema_node.i_module.i_including_modulename) == module
-        return schema_node.i_module == module
+        main_module = self.get_main_module(schema_node, module)
+        return main_module == module
 
     def add_to_path(self, schema_node, parent, module, prefix=""):
         main_module = self.get_main_module(schema_node, module)
@@ -882,7 +880,8 @@ class SidFile:
 
     def get_main_module(self, schema_node, module):
         if schema_node.i_module.keyword == 'submodule':
-            main_module = self.get_module_by_name(schema_node.i_module.i_including_modulename, module)
+            main_module = self.get_module_by_name(
+                schema_node.i_module.i_including_modulename, module)
         else:
             main_module = schema_node.i_module
 
