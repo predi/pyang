@@ -1,5 +1,5 @@
 test: test1 test2 test3 test3legacy test4 test5 test6 test7 test8 test9 test10 test11 test12 test14 test15 test16 \
-      test17 test18 test19 test20 test21 test22 test23 test24
+      test17 test18 test19 test20 test21 test22 test23 test24 test25
 
 test1:
 	# Test help
@@ -138,4 +138,12 @@ test24:
 	$(PYANG) --sid-list --sid-generate-file 20000:25 test-24-mod.yang 2>&1 | diff -b test-24-expected-output.txt -
 	diff -b test-24-expected-test-24-mod@unknown.sid test-24-mod@unknown.sid
 	$(PYANG) --sid-check-file-valid test-24-mod@unknown.sid test-24-mod.yang 2>&1 | diff -b test-expected-output-when-valid.txt -
-	rm test-24-mod@unknown.sid
+	rm -f test-24-mod@unknown.sid
+
+test25:
+	# Test check sid file with updated import that affects the mapping
+	$(PYANG) --sid-list --sid-generate-file 36000:25 test-25-mod@2023-01-01.yang 2>&1 | diff -b test-25-expected-output.txt -
+	cp test-25-dep@2023-03-01.notyang test-25-dep@2023-03-01.yang
+	$(PYANG) --sid-list --sid-check-file test-25-mod@2023-01-01.sid test-25-mod@2023-01-01.yang 2>&1 | diff -b test-25b-expected-output.txt -
+	$(PYANG) --sid-check-file-valid test-25-mod@2023-01-01.sid test-25-mod@2023-01-01.yang 2>&1 | diff -b test-25c-expected-output.txt -
+	rm -f test-25-mod@2023-01-01.sid test-25-dep@2023-03-01.yang

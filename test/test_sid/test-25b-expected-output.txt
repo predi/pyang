@@ -1,0 +1,12 @@
+Checking consistency of 'test-25-mod@2023-01-01.sid'
+
+SID        Assigned to
+---------  --------------------------------------------------
+36000      module test-25-mod
+36001      data /test-25-mod:top
+36002      data /test-25-mod:top/item
+36003      data /test-25-mod:top/item/description
+36004      data /test-25-mod:top/item/name
+36005      data /test-25-mod:top/item/property (New)
+
+The .sid file needs to be updated.

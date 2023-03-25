@@ -1,0 +1,13 @@
+module test-25-dep {
+    yang-version 1.1;
+    namespace "test-25-dep:uri";
+    prefix t25d;
+
+    revision 2023-01-01;
+
+    grouping common {
+        leaf description {
+            type string;
+        }
+    }
+}

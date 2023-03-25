@@ -1,0 +1,21 @@
+module test-25-mod {
+    yang-version 1.1;
+    namespace "test-25-mod:uri";
+    prefix t25;
+
+    import test-25-dep {
+        prefix t25d;
+    }
+
+    revision 2023-01-01;
+
+    container top {
+        list item {
+            key name;
+            leaf name {
+                type string;
+            }
+            uses t25d:common;
+        }
+    }
+}
