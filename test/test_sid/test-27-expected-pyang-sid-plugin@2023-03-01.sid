@@ -1,0 +1,38 @@
+{
+  "ietf-sid-file:sid-file": {
+    "module-name": "pyang-sid-plugin",
+    "module-revision": "2023-03-01",
+    "dependency-revision": [
+      {
+        "module-name": "ietf-yang-structure-ext",
+        "module-revision": "2020-06-17"
+      },
+      {
+        "module-name": "ietf-sid-file",
+        "module-revision": "2023-03-01"
+      },
+      {
+        "module-name": "ietf-yang-types",
+        "module-revision": "2013-07-15"
+      }
+    ],
+    "assignment-range": [
+      {
+        "entry-point": "2000",
+        "size": "25"
+      }
+    ],
+    "item": [
+      {
+        "namespace": "module",
+        "identifier": "pyang-sid-plugin",
+        "sid": "2000"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file/pyang-sid-plugin:pyang-sid-plugin-version",
+        "sid": "2001"
+      }
+    ]
+  }
+}

@@ -1,5 +1,5 @@
 test: test1 test2 test3 test3legacy test4 test5 test6 test7 test8 test9 test10 test11 test12 test14 test15 test16 \
-      test17 test18 test19 test20 test21 test22 test23 test24 test25 test26
+      test17 test18 test19 test20 test21 test22 test23 test24 test25 test26 test27
 
 test1:
 	# Test help
@@ -154,3 +154,10 @@ test26:
 	diff -b test-26-expected-ietf-sid-file@2023-03-01.sid ietf-sid-file@2023-03-01.sid
 	$(PYANG) --sid-check-file-valid ietf-sid-file@2023-03-01.sid ietf-sid-file@2023-03-01.yang 2>&1 | diff -b test-expected-output-when-valid.txt -
 	rm -f ietf-sid-file@2023-03-01.sid
+
+test27:
+	# Test generate sid file, sx:augment-structure example - uncomment once sx:augment-structure is implemented
+	#$(PYANG) --sid-list --sid-generate-file 2000:25 pyang-sid-plugin@2023-03-01.yang 2>&1 | diff -b test-27-expected-output.txt -
+	#diff -b pyang-sid-plugin@2023-03-01.sid pyang-sid-plugin@2023-03-01.sid
+	#$(PYANG) --sid-check-file-valid pyang-sid-plugin@2023-03-01.sid pyang-sid-plugin@2023-03-01.yang 2>&1 | diff -b test-expected-output-when-valid.txt -
+	#rm -f pyang-sid-plugin@2023-03-01.sid

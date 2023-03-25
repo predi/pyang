@@ -1,0 +1,24 @@
+module pyang-sid-plugin {
+    yang-version 1.1;
+    namespace "pyang-sid-plugin:uri";
+    prefix psp;
+
+    import ietf-yang-structure-ext {
+        prefix sx;
+    }
+
+    import ietf-sid-file {
+        prefix sid;
+    }
+
+    revision 2023-03-01;
+
+    sx:augment-structure "/sid:sid-file" {
+        leaf pyang-sid-plugin-version {
+            type string {
+                pattern '\d+\.\d+.\d+';
+            }
+            description "Version of the pyang sid plugin that generated the sid-file.";
+        }
+    }
+}
