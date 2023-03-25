@@ -1,5 +1,5 @@
 test: test1 test2 test3 test3legacy test4 test5 test6 test7 test8 test9 test10 test11 test12 test14 test15 test16 \
-      test17 test18 test19 test20 test21 test22 test23 test24 test25
+      test17 test18 test19 test20 test21 test22 test23 test24 test25 test26
 
 test1:
 	# Test help
@@ -147,3 +147,10 @@ test25:
 	$(PYANG) --sid-list --sid-check-file test-25-mod@2023-01-01.sid test-25-mod@2023-01-01.yang 2>&1 | diff -b test-25b-expected-output.txt -
 	$(PYANG) --sid-check-file-valid test-25-mod@2023-01-01.sid test-25-mod@2023-01-01.yang 2>&1 | diff -b test-25c-expected-output.txt -
 	rm -f test-25-mod@2023-01-01.sid test-25-dep@2023-03-01.yang
+
+test26:
+	# Test generate sid file, sx:structure example (ietf-sid-file)
+	$(PYANG) --sid-list --sid-generate-file 20000:25 ietf-sid-file@2023-03-01.yang 2>&1 | diff -b test-26-expected-output.txt -
+	diff -b test-26-expected-ietf-sid-file@2023-03-01.sid ietf-sid-file@2023-03-01.sid
+	$(PYANG) --sid-check-file-valid ietf-sid-file@2023-03-01.sid ietf-sid-file@2023-03-01.yang 2>&1 | diff -b test-expected-output-when-valid.txt -
+	rm -f ietf-sid-file@2023-03-01.sid

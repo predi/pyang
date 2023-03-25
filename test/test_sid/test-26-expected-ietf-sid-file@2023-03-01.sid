@@ -1,0 +1,114 @@
+{
+  "ietf-sid-file:sid-file": {
+    "module-name": "ietf-sid-file",
+    "module-revision": "2023-03-01",
+    "dependency-revision": [
+      {
+        "module-name": "ietf-yang-types",
+        "module-revision": "2013-07-15"
+      },
+      {
+        "module-name": "ietf-yang-structure-ext",
+        "module-revision": "2020-06-17"
+      }
+    ],
+    "assignment-range": [
+      {
+        "entry-point": "20000",
+        "size": "25"
+      }
+    ],
+    "item": [
+      {
+        "namespace": "module",
+        "identifier": "ietf-sid-file",
+        "sid": "20000"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file",
+        "sid": "20001"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file/assignment-range",
+        "sid": "20002"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file/assignment-range/entry-point",
+        "sid": "20003"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file/assignment-range/size",
+        "sid": "20004"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file/dependency-revision",
+        "sid": "20005"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file/dependency-revision/module-name",
+        "sid": "20006"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file/dependency-revision/module-revision",
+        "sid": "20007"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file/description",
+        "sid": "20008"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file/item",
+        "sid": "20009"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file/item/identifier",
+        "sid": "20010"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file/item/namespace",
+        "sid": "20011"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file/item/sid",
+        "sid": "20012"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file/item/status",
+        "sid": "20013"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file/module-name",
+        "sid": "20014"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file/module-revision",
+        "sid": "20015"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file/sid-file-status",
+        "sid": "20016"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/ietf-sid-file:sid-file/sid-file-version",
+        "sid": "20017"
+      }
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+
+SID        Assigned to
+---------  --------------------------------------------------
+20000      module ietf-sid-file
+20001      data /ietf-sid-file:sid-file
+20002      data /ietf-sid-file:sid-file/assignment-range
+20003      data /ietf-sid-file:sid-file/assignment-range/entry-point
+20004      data /ietf-sid-file:sid-file/assignment-range/size
+20005      data /ietf-sid-file:sid-file/dependency-revision
+20006      data /ietf-sid-file:sid-file/dependency-revision/module-name
+20007      data /ietf-sid-file:sid-file/dependency-revision/module-revision
+20008      data /ietf-sid-file:sid-file/description
+20009      data /ietf-sid-file:sid-file/item
+20010      data /ietf-sid-file:sid-file/item/identifier
+20011      data /ietf-sid-file:sid-file/item/namespace
+20012      data /ietf-sid-file:sid-file/item/sid
+20013      data /ietf-sid-file:sid-file/item/status
+20014      data /ietf-sid-file:sid-file/module-name
+20015      data /ietf-sid-file:sid-file/module-revision
+20016      data /ietf-sid-file:sid-file/sid-file-status
+20017      data /ietf-sid-file:sid-file/sid-file-version
+
+File ietf-sid-file@2023-03-01.sid created
+Number of SIDs available : 25
+Number of SIDs used : 18
